@@ -1,8 +1,6 @@
 import React from 'react';
 import Util from '../util';
-import Global from '../';
 import defaultcss from './field.css';
-import { createDo } from 'typescript';
 
 class IFrameField extends React.Component {
 	static eventID = 'openedge:field:';
