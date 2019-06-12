@@ -1,7 +1,6 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import UI from './UI/UI';
 import Util from './util';
+import Form from './UI/Form';
 
 (function () {
 	class OpenPayPlugin {
@@ -40,12 +39,9 @@ import Util from './util';
 			if (formOptions && formOptions.fields) {
 				fields = Util.mergeDeep(fields, formOptions.fields);
 			}
-			if (target === false) {
-				target = document.createElement('div');
-			}
-			ReactDOM.render(<UI.Form {...formOptions} fields={fields} />, target);
 
-			var form = null;
+			const form = new Form(fields, formOptions);
+			form.renderTo(target);
 			return form;
 		};
 

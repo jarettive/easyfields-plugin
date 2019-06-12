@@ -1,28 +1,50 @@
-import React from 'react';
 import Util from '../util';
 import defaultcss from './field.css';
 
-class IFrameField extends React.Component {
+class IFrameField {
 	static eventID = 'openedge:field:';
 	static paymentFieldID = 'openedge-payment-field';
 	static fieldURL = 'http://127.0.0.1:5501/field.html';
 
-	constructor(props) {
-		super(props);
+	constructor(name, data) {
+		this.data = data;
+		this.name = name;
 		this.attachOriginWindowListener();
 		this.id = btoa(Util.guidGenerator());
 	}
 
-	render() {
-		const props = this.props;
-		const name = props.name.replace(/\s/g, '');
+	renderTo(target) {
+		if (typeof target === 'string') {
+			target = document.querySelector(target);
+		}
+		const el = document.createElement('div');
+
+		const name = this.name.replace(/\s/g, '');
+		el.id = 'openedge-' + name;
+		el.classList.add('openedge-field');
+
+		this.iframe = this.createIFrameElement(name)
+		el.appendChild(this.iframe);
+
+		if (target instanceof HTMLElement) {
+			target.appendChild(el);
+		}
+	}
+
+	createIFrameElement(name) {
+		const iframe = document.createElement('iframe');
 		const src = IFrameField.fieldURL + '#' + btoa(
 			JSON.stringify({
 				originURL: window.location.href,
 				id: this.id,
-				name: name
+				name,
 			}));
+		iframe.name = name;
+		iframe.src = src;
+		return iframe;
+	}
 
+	render() {
 		return (
 			<div id={'openedge-' + name} className='openedge-field'>
 				{props.label && <label>{props.label}</label>}
@@ -60,15 +82,14 @@ class IFrameField extends React.Component {
 	}
 
 	onRegister() {
-		this.postToChild(Object.assign({}, this.props), 'setUpPaymentField');
+		this.postToChild(this.data, 'setUpPaymentField');
 	}
 
-	static register(type) {
+	static register(name) {
 		var self = IFrameField;
-
 		const query = window.location.hash.replace('#', '');
 		const iframeData = JSON.parse(atob(query));
-		iframeData.type = type;
+		iframeData.name = name;
 		IFrameField.data = iframeData;
 
 		//Create and render the input field
@@ -85,7 +106,7 @@ class IFrameField extends React.Component {
 		const field = document.getElementById(IFrameField.paymentFieldID);
 		field.setAttribute('placeholder', data.placeholder || '');
 		field.setAttribute('value', data.value || '');
-		Util.addStyleSheet(data.style || (data.defaultStyle && defaultcss) || '');
+		Util.addStyleSheet(data.style || (!data.defaultStyle && defaultcss) || '');
 		IFrameField.triggerResize();
 	}
 
@@ -136,7 +157,7 @@ class IFrameField extends React.Component {
 	static requestData(queryData) {
 		const field = document.getElementById(IFrameField.paymentFieldID);
 		let value = field && field.value ? field.value : '';
-		if (IFrameField.data.type === 'card-number') {
+		if (IFrameField.data.name === 'card-number') {
 			value = '';
 			window.fieldTypes = queryData.fieldTypes;
 		}
