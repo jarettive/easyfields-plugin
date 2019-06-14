@@ -36,8 +36,10 @@ class IFrameField {
 		if (label) {
 			el.appendChild(label);
 		}
+
 		this.iframe = this.createIFrameElement(name);
 		el.appendChild(this.iframe);
+
 		return el;
 	}
 
@@ -77,32 +79,25 @@ class IFrameField {
 	}
 
 	handleEventFromChild = (event) => {
+		const data = event.data;
 		const self = this;
+		if (!data.id || (data.id !== self.id)) {
+			return;
+		}
+
 		const fieldEventType = event.data.type && event.data.type.replace(IFrameField.eventID, '');
-		if (event.data.id === self.id) {
-			if (fieldEventType === 'register') {
-				self.onRegister();
-			}
-			if (fieldEventType === 'resize') {
-				self.iframe.style.height = event.data.height + 'px';
-			}
+
+		if (fieldEventType === 'register') {
+			self.onRegister();
+		}
+		if (fieldEventType === 'resize') {
+			self.iframe.style.height = data.height + 'px';
 		}
 	}
 
 	onRegister() {
 		this.postToChild(Object.assign({}, this.data), 'initializePaymentField');
 		// this.emit('register');
-	}
-
-	passData(fieldData) {
-		this.iframe.contentWindow.postMessage(
-			{
-				name: fieldData.name,
-				value: fieldData.value,
-				type: IFrameField.eventID + 'accumulateData'
-			},
-			IFrameField.fieldURL
-		)
 	}
 
 	static register(name) {
@@ -113,7 +108,9 @@ class IFrameField {
 
 		//Create and render the input field
 		IFrameField.createField(iframeData);
+
 		window.addEventListener('message', this.handleEventFromParent, false);
+
 		IFrameField.postToParent(
 			{ name, id: iframeData.id },
 			'register'
@@ -131,7 +128,7 @@ class IFrameField {
 		IFrameField.triggerResize();
 	}
 
-	//Tell the parent the height of the window content so it can resize the iframe appropriately
+	//Tell the parent window the height of this window's content so it can resize the iframe appropriately
 	static triggerResize() {
 		IFrameField.postToParent(
 			{
@@ -156,7 +153,10 @@ class IFrameField {
 		const button = document.createElement('button');
 		button.addEventListener('click', function () {
 			IFrameField.postToParent(
-				{ name: iframeData.name },
+				{
+					name: iframeData.name,
+					id: IFrameField.data.id
+				},
 				'submitClick'
 			);
 		});
@@ -174,17 +174,35 @@ class IFrameField {
 	static requestData(queryData) {
 		const field = document.getElementById(IFrameField.paymentFieldID);
 		let value = field && field.value ? field.value : '';
-		if (IFrameField.data.name === 'card-number') {
-			value = '';
+
+		if (IFrameField.isAccumulator(window)) {
 			window.fieldTypes = queryData.fieldTypes;
+			window.receivedFields = window.receivedFields || {};
+			window.receivedFields['card-number'] = value;
+		} else {
+			IFrameField.passToAccumulatorWindow(value);
 		}
-		IFrameField.postToParent(
-			{
-				name: window.name,
-				value: value
-			},
-			'returnRequestedData'
-		)
+	}
+
+	static isAccumulator(window) {
+		return (window.name === 'card-number');
+	}
+
+	// One of the windows -- in this case the 'card-number' window -- is the accumulator. This method finds that accumulator window and passes
+	// the value from this window's input field to it.
+	static passToAccumulatorWindow(value) {
+		for (var i = 0; i < window.parent.frames.length; i++) {
+			var siblingWindow = window.parent.frames[i];
+			if (IFrameField.isAccumulator(siblingWindow)) {
+				siblingWindow.postMessage(
+					{
+						name: window.name,
+						value: value,
+						type: IFrameField.eventID + 'accumulateData'
+					}
+					, IFrameField.fieldURL);
+			}
+		}
 	}
 
 	//Receive field data from another window into the card-number/account-number window. Once all other field data
@@ -192,10 +210,21 @@ class IFrameField {
 	static accumulateData(data) {
 		window.receivedFields = window.receivedFields || {};
 		window.receivedFields[data.name] = data.value;
-		const receivedTypes = Object.keys(receivedFields);
+
+		window.fieldTypes = window.fieldTypes || {};
+
+		const receivedTypes = Object.keys(window.receivedFields);
+
 		if (JSON.stringify(receivedTypes.sort()) ===
 			JSON.stringify(window.fieldTypes.sort())) {
 			console.dir(window.receivedFields);
+
+			// TODO: Implement tokenization here 
+
+			// 
+
+			// TODO: Trigger a 'token-success' event for the Form to catch 
+
 			window.receivedFields = {};
 		}
 	}

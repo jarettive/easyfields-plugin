@@ -4,6 +4,7 @@ import Form from './UI/Form';
 
 (function () {
 	class OpenEdgePlugin {
+
 		defaultFields = {
 			"card-holder-name": {
 				placeholder: "John Doe",
@@ -34,7 +35,17 @@ import Form from './UI/Form';
 				}
 				target = el;
 			}
+
+			const fields = this.configureFormFields(target, formOptions);
+
+			const form = new Form(fields, formOptions);
+			form.render(target);
+			return form;
+		};
+
+		configureFormFields(target, formOptions) {
 			let fields = this.defaultFields;
+
 			if (formOptions && formOptions.fields) {
 				if (target) {
 					fields = Util.mergeDeep(fields, formOptions.fields);
@@ -47,14 +58,7 @@ import Form from './UI/Form';
 					}
 				}
 			}
-			const form = new Form(fields, formOptions);
-			form.render(target);
-			return form;
-		};
-
-		makeFields = function (fields, formOptions) {
-			const form = new Form(fields, formOptions);
-			form.renderTo(false);
+			return fields;
 		}
 
 		UI = UI;

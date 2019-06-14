@@ -1,4 +1,4 @@
-import defaultcss from './Form.css';
+import defaultCSS from './Form.css';
 import IFrameField from './IFrameField';
 import Util from '../util';
 import EventEmitter from "./EventEmitter";
@@ -11,10 +11,10 @@ class Form extends EventEmitter {
 		formOptions = formOptions || {};
 		this.fields = fields;
 		if (formOptions.defaultStyle !== false) {
-			Util.addStyleSheet(defaultcss);
+			Util.addStyleSheet(defaultCSS);
 		}
 		this.unregisteredFields = Object.keys(this.fields);
-		window.addEventListener('message', this.windowMsgHandler, false);
+		window.addEventListener('message', this.handleWindowMsg, false);
 	}
 
 	render(target) {
@@ -40,12 +40,12 @@ class Form extends EventEmitter {
 		return el;
 	}
 
-	windowMsgHandler = (event) => {
-		const fieldEventType = event.data.type && event.data.type.replace(IFrameField.eventID, '');
+	handleWindowMsg = (msg) => {
+		const fieldEventType = (msg.data.type && msg.data.type.replace(IFrameField.eventID, '')) || '';
 
 		switch (fieldEventType) {
 			case 'register':
-				this.unregisteredFields = this.unregisteredFields.filter(item => item !== event.data.name);
+				this.unregisteredFields = this.unregisteredFields.filter(item => item !== msg.data.name);
 				if (this.unregisteredFields === undefined || this.unregisteredFields.length === 0) {
 					this.emit('ready');
 				}
@@ -53,8 +53,6 @@ class Form extends EventEmitter {
 			case 'submitClick':
 				this.requestDataFromFields();
 				break;
-			case 'returnRequestedData':
-				this.passData(event.data);
 			default:
 				break;
 		}
@@ -66,14 +64,6 @@ class Form extends EventEmitter {
 			field.requestFieldData({ fieldTypes });
 		}
 	}
-
-	passData(fieldData) {
-		const targetField = this.iFrameFields.find((iFrameField) => {
-			return iFrameField.name === 'card-number';
-		});
-		targetField.passData(fieldData);
-	}
-
 }
 
 export default Form;
