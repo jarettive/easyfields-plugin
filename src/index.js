@@ -3,7 +3,7 @@ import Util from './util';
 import Form from './UI/Form';
 
 (function () {
-	class OpenPayPlugin {
+	class OpenEdgePlugin {
 		defaultFields = {
 			"card-holder-name": {
 				placeholder: "John Doe",
@@ -27,7 +27,6 @@ import Form from './UI/Form';
 		};
 
 		makeForm = function (target, formOptions) {
-
 			if (typeof target === "string") {
 				const el = document.querySelector(target);
 				if (!el) {
@@ -37,16 +36,29 @@ import Form from './UI/Form';
 			}
 			let fields = this.defaultFields;
 			if (formOptions && formOptions.fields) {
-				fields = Util.mergeDeep(fields, formOptions.fields);
+				if (target) {
+					fields = Util.mergeDeep(fields, formOptions.fields);
+				}
+				else {
+					fields = formOptions.fields;
+					var fieldTypes = Object.keys(fields);
+					for (var type of fieldTypes) {
+						fields[type] = Util.mergeDeep(this.defaultFields[type], fields[type]);
+					}
+				}
 			}
-
 			const form = new Form(fields, formOptions);
-			form.renderTo(target);
+			form.render(target);
 			return form;
 		};
+
+		makeFields = function (fields, formOptions) {
+			const form = new Form(fields, formOptions);
+			form.renderTo(false);
+		}
 
 		UI = UI;
 	};
 
-	window.OpenPayPlugin = new OpenPayPlugin();
+	window.OpenEdgePlugin = new OpenEdgePlugin();
 }());

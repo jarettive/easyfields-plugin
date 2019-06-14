@@ -1,33 +1,43 @@
 import defaultcss from './Form.css';
 import IFrameField from './IFrameField';
 import Util from '../util';
+import EventEmitter from "./EventEmitter";
 
-class Form {
+class Form extends EventEmitter {
 	iFrameFields = [];
 
 	constructor(fields, formOptions) {
+		super();
 		formOptions = formOptions || {};
 		this.fields = fields;
 		if (formOptions.defaultStyle !== false) {
 			Util.addStyleSheet(defaultcss);
 		}
+		this.unregisteredFields = Object.keys(this.fields);
+		window.addEventListener('message', this.windowMsgHandler, false);
 	}
 
-	renderTo(target) {
-		const fields = this.fields;
+	render(target) {
+		const el = this.createMainElement();
+
+		if (target instanceof HTMLElement) {
+			target.appendChild(el);
+		}
+	}
+
+	createMainElement() {
 		const el = document.createElement('div');
 		el.classList.add("openedge-form");
-		Object.keys(fields).map((type) => {
-			const fieldData = fields[type];
-			const target = fieldData.target;
-			const iframeField = new IFrameField(type, fieldData);
-			iframeField.renderTo(target || el);
+
+		const fields = this.fields;
+		Object.keys(fields).map((name) => {
+			const fieldData = fields[name];
+			const iframeField = new IFrameField(name, fieldData);
+			iframeField.render(fieldData.target || el);
 			this.iFrameFields.push(iframeField);
 		});
-		target.appendChild(el);
 
-		// self.unregisteredFields = Array.from(self.props.fields, x => x.name.replace(/\s/g, ''));
-		window.addEventListener('message', this.windowMsgHandler, false);
+		return el;
 	}
 
 	windowMsgHandler = (event) => {
@@ -35,12 +45,15 @@ class Form {
 
 		switch (fieldEventType) {
 			case 'register':
-				// this.unregisteredFields = this.unregisteredFields.filter(item => item !== event.data);
+				this.unregisteredFields = this.unregisteredFields.filter(item => item !== event.data.name);
+				if (this.unregisteredFields === undefined || this.unregisteredFields.length === 0) {
+					this.emit('ready');
+				}
 				break;
 			case 'submitClick':
 				this.requestDataFromFields();
 				break;
-			case 'passData':
+			case 'returnRequestedData':
 				this.passData(event.data);
 			default:
 				break;
@@ -58,14 +71,7 @@ class Form {
 		const targetField = this.iFrameFields.find((iFrameField) => {
 			return iFrameField.name === 'card-number';
 		});
-		targetField.iframe.contentWindow.postMessage(
-			{
-				name: fieldData.name,
-				value: fieldData.value,
-				type: IFrameField.eventID + 'accumulateData'
-			},
-			IFrameField.fieldURL
-		)
+		targetField.passData(fieldData);
 	}
 
 }
