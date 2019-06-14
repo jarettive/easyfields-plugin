@@ -35,24 +35,41 @@
 	<div class="merchantPage">
 		<h1>This is the Merchant Page</h1>
 		<div id="merchantCreditCard"></div>
+		<div id="merchantCVV"></div>
 		<div id="OpenPayForm">
 		</div>
 	</div>
 	<script src="easyfields-plugin.js"></script>
 </body>
 <script>
-	// OpenPayPlugin.makeForm('#OpenPayForm');
-	OpenPayPlugin.makeForm(false, {
-		// defaultStyle: false,
+	var form = OpenEdgePlugin.makeForm('#OpenPayForm', {
 		fields: {
-			"card-number": {
-				target: "#merchantCreditCard",
-				style: 'input {border-radius: 10px; padding:10px;}'
-			},
+			'submit': {
+				value: "Pay $20.00"
+			}
 		}
 	});
+	// var form = OpenEdgePlugin.makeForm(false, {
+	// // defaultStyle: false,
+	// fields: {
+	// "card-number": {
+	// target: "#merchantCreditCard",
+	// style: 'input {border-radius: 10px; padding:10px;}'
+	// },
+	// 'submit': {
+	// value: 'Pay $20.00'
+	// }
+	// }
+	// });
 
-	// var cardForm = GlobalPayments.creditCard.form("#HeartlandForm");
+	form.on('ready', function () {
+		console.log('form ready');
+	});
+	form.on('token-success', function (token) {
+		console.log("successful token creation: " + token);
+	})
+
+// var cardForm = GlobalPayments.creditCard.form("#HeartlandForm");
 </script>
 
 </html>

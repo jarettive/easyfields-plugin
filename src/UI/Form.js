@@ -1,113 +1,77 @@
-import React from 'react';
 import defaultcss from './Form.css';
 import IFrameField from './IFrameField';
 import Util from '../util';
-import ReactDOM from 'react-dom';
+import EventEmitter from "./EventEmitter";
 
-class Form extends React.Component {
-	static defaultProps = { defaultStyle: true }
+class Form extends EventEmitter {
+	iFrameFields = [];
 
-	fieldRefs = [];
-
-	constructor(props) {
-		super(props);
-		if (this.props.defaultStyle) {
+	constructor(fields, formOptions) {
+		super();
+		formOptions = formOptions || {};
+		this.fields = fields;
+		if (formOptions.defaultStyle !== false) {
 			Util.addStyleSheet(defaultcss);
+		}
+		this.unregisteredFields = Object.keys(this.fields);
+		window.addEventListener('message', this.windowMsgHandler, false);
+	}
+
+	render(target) {
+		const el = this.createMainElement();
+
+		if (target instanceof HTMLElement) {
+			target.appendChild(el);
 		}
 	}
 
-	render() {
-		const props = this.props;
-		return (
-			<div className='openedge-form' >
-				{
-					Object.keys(props.fields).map((key) => {
-						const field = props.fields[key];
-						const target = field.target;
-						if (!target) {
-							return this.createIFrameField(field, key);
-						}
-					})
-				}
-			</div>
-		);
-	}
+	createMainElement() {
+		const el = document.createElement('div');
+		el.classList.add("openedge-form");
 
-	componentDidMount() {
-		var self = this;
-		self.unregisteredFields = Array.from(self.props.fields, x => x.name.replace(/\s/g, ''));
-		window.addEventListener('message', this.windowMsgHandler, false);
-		this.addIframeFields();
-	}
+		const fields = this.fields;
+		Object.keys(fields).map((name) => {
+			const fieldData = fields[name];
+			const iframeField = new IFrameField(name, fieldData);
+			iframeField.render(fieldData.target || el);
+			this.iFrameFields.push(iframeField);
+		});
 
+		return el;
+	}
 
 	windowMsgHandler = (event) => {
 		const fieldEventType = event.data.type && event.data.type.replace(IFrameField.eventID, '');
 
 		switch (fieldEventType) {
 			case 'register':
-				this.unregisteredFields = this.unregisteredFields.filter(item => item !== event.data);
+				this.unregisteredFields = this.unregisteredFields.filter(item => item !== event.data.name);
+				if (this.unregisteredFields === undefined || this.unregisteredFields.length === 0) {
+					this.emit('ready');
+				}
 				break;
 			case 'submitClick':
 				this.requestDataFromFields();
 				break;
-			case 'passData':
+			case 'returnRequestedData':
 				this.passData(event.data);
 			default:
 				break;
 		}
 	}
 
-	createIFrameField(field, key) {
-		const frameField = <IFrameField
-			{...field}
-			ref={(c) => { this.fieldRefs.push(c) }}
-			name={key}
-			key={key}
-			defaultStyle={this.props.defaultStyle}
-		></IFrameField>
-		return frameField;
-	}
-
-	addIframeFields() {
-		const props = this.props;
-		Object.keys(props.fields).map((key) => {
-			const field = props.fields[key];
-			const iFrameField = this.createIFrameField(field, key);
-			const target = field.target;
-			if (target) {
-				let el = '';
-				if (typeof target === 'string') {
-					el = document.querySelector(target);
-					if (!el) {
-						throw new Error('Field target does not exist');
-					}
-				}
-				ReactDOM.render(iFrameField, el)
-			}
-		})
-	}
-
 	requestDataFromFields() {
-		var fieldTypes = Object.keys(this.props.fields);
-
-		for (var field of this.fieldRefs) {
+		var fieldTypes = Object.keys(this.fields);
+		for (var field of this.iFrameFields) {
 			field.requestFieldData({ fieldTypes });
 		}
 	}
 
 	passData(fieldData) {
-		const targetField = this.fieldRefs.find((iFrameField) => {
-			return iFrameField.props.name === 'card-number';
+		const targetField = this.iFrameFields.find((iFrameField) => {
+			return iFrameField.name === 'card-number';
 		});
-		targetField.iframe.contentWindow.postMessage(
-			{
-				name: fieldData.name,
-				value: fieldData.value,
-				type: IFrameField.eventID + 'accumulateData'
-			},
-			IFrameField.fieldURL
-		)
+		targetField.passData(fieldData);
 	}
 
 }

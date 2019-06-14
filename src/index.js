@@ -1,10 +1,9 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
 import UI from './UI/UI';
 import Util from './util';
+import Form from './UI/Form';
 
 (function () {
-	class OpenPayPlugin {
+	class OpenEdgePlugin {
 		defaultFields = {
 			"card-holder-name": {
 				placeholder: "John Doe",
@@ -28,7 +27,6 @@ import Util from './util';
 		};
 
 		makeForm = function (target, formOptions) {
-
 			if (typeof target === "string") {
 				const el = document.querySelector(target);
 				if (!el) {
@@ -38,19 +36,29 @@ import Util from './util';
 			}
 			let fields = this.defaultFields;
 			if (formOptions && formOptions.fields) {
-				fields = Util.mergeDeep(fields, formOptions.fields);
+				if (target) {
+					fields = Util.mergeDeep(fields, formOptions.fields);
+				}
+				else {
+					fields = formOptions.fields;
+					var fieldTypes = Object.keys(fields);
+					for (var type of fieldTypes) {
+						fields[type] = Util.mergeDeep(this.defaultFields[type], fields[type]);
+					}
+				}
 			}
-			if (target === false) {
-				target = document.createElement('div');
-			}
-			ReactDOM.render(<UI.Form {...formOptions} fields={fields} />, target);
-
-			var form = null;
+			const form = new Form(fields, formOptions);
+			form.render(target);
 			return form;
 		};
+
+		makeFields = function (fields, formOptions) {
+			const form = new Form(fields, formOptions);
+			form.renderTo(false);
+		}
 
 		UI = UI;
 	};
 
-	window.OpenPayPlugin = new OpenPayPlugin();
+	window.OpenEdgePlugin = new OpenEdgePlugin();
 }());
