@@ -45,16 +45,20 @@ class Form extends EventEmitter {
 
 		switch (fieldEventType) {
 			case 'register':
-				this.unregisteredFields = this.unregisteredFields.filter(item => item !== msg.data.name);
-				if (this.unregisteredFields === undefined || this.unregisteredFields.length === 0) {
-					this.emit('ready');
-				}
+				this.onFieldRegister(msg.data.name);
 				break;
 			case 'submitClick':
 				this.requestDataFromFields();
 				break;
 			default:
 				break;
+		}
+	}
+
+	onFieldRegister = (fieldName) => {
+		this.unregisteredFields = this.unregisteredFields.filter(item => item !== fieldName);
+		if (this.unregisteredFields === undefined || this.unregisteredFields.length === 0) {
+			this.emit('ready');
 		}
 	}
 

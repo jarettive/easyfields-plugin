@@ -122,13 +122,25 @@ class IFrameField {
 
 	static initializePaymentField(data) {
 		const field = document.getElementById(IFrameField.paymentFieldID);
-		field.setAttribute('placeholder', data.placeholder || '');
-		field.setAttribute('value', data.value || '');
+		IFrameField.setPlaceholder(field, data.placeholder);
+		field.setAttribute('value', Util.encodeEntities(data.value) || '');
 		if (IFrameField.data.name === 'submit') {
-			field.innerHTML = data.value;
+			field.textContent = Util.encodeEntities(data.value);
 		}
 		Util.addStyleSheet(data.style || (!data.defaultStyle && defaultcss) || '');
 		IFrameField.triggerResize();
+	}
+
+	static setPlaceholder(field, placeholder) {
+		for (const ch of placeholder) {
+			if (ch !== '·' &&
+				ch !== '•' &&
+				ch !== ' ') {
+				placeholder = Util.encodeEntities(placeholder);
+				break;
+			}
+		}
+		field.setAttribute('placeholder', placeholder || '');
 	}
 
 	//Tell the parent window the height of this window's content so it can resize the iframe appropriately

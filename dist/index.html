@@ -50,14 +50,15 @@
 			}
 		}
 	});
+
 	// var form = OpenEdgePlugin.makeForm(false, {
-	// 	// defaultStyle: false,
+	// 	defaultStyle: false,
 	// 	fields: {
 	// 		"card-number": {
 	// 			target: "#merchantCreditCard",
 	// 			style: 'input {border-radius: 10px; padding:10px;}'
 	// 		},
-	// 		'submit': {
+	// 		'submit': {  
 	// 			value: 'Pay $20.00'
 	// 		}
 	// 	}
@@ -66,6 +67,7 @@
 	form.on('ready', function () {
 		console.log('form ready');
 	});
+
 	form.on('token-success', function (token) {
 		console.log("successful token creation: " + token);
 	})
