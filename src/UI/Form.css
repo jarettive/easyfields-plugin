@@ -1,7 +1,6 @@
 .openedge-form {
   background: white;
   padding: 1em 1.5em .6em;
-  font-family: sans-serif;
   font-weight: bold;
   font-size: .8em;
   border-radius: .5em;
@@ -12,7 +11,8 @@
 }
 
 .openedge-field {
-  margin: 1.8em 0;
+  margin: 1.2rem 0;
+  font-family: sans-serif;
 }
 
 .openedge-field label {

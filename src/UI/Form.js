@@ -1,7 +1,7 @@
 import defaultCSS from './Form.css';
 import IFrameField from './IFrameField';
 import Util from '../util';
-import EventEmitter from "./EventEmitter";
+import EventEmitter from './EventEmitter';
 
 class Form extends EventEmitter {
 	iFrameFields = [];
@@ -27,7 +27,7 @@ class Form extends EventEmitter {
 
 	createMainElement() {
 		const el = document.createElement('div');
-		el.classList.add("openedge-form");
+		el.classList.add('openedge-form');
 
 		const fields = this.fields;
 		Object.keys(fields).map((name) => {

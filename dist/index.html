@@ -5,64 +5,73 @@
 	<meta charset="utf-8" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<!-- <script src="https://cdn.jsdelivr.net/gh/jarettive/easyfields-plugin/dist/easyfields-plugin.js"></script> -->
-	<title>Plugin Demo</title>
-	<style>
-		body,
-		html {
-			margin: 0;
-			height: 100%;
-		}
+	<title>EasyFields Test Page</title>
 
-		.merchantPage {
-			height: 100%;
-			display: -webkit-box;
-			display: -ms-flexbox;
-			display: flex;
-			color: white;
-			padding: 4em;
-			-webkit-box-orient: vertical;
-			-webkit-box-direction: normal;
-			-ms-flex-direction: column;
-			flex-direction: column;
-			-webkit-box-align: center;
-			-ms-flex-align: center;
-			align-items: center;
-			background: #363636;
-		}
-	</style>
+	<!--Vue dev -->
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<!-- Vue prod -->
+	<!-- <script src="https://cdn.jsdelivr.net/npm/vue"></script> -->
+
+	<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="merchantPage.css">
 </head>
 
 <body>
-	<div class="merchantPage">
-		<h1>This is the Merchant Page</h1>
-		<div id="merchantCreditCard"></div>
-		<div id="merchantCVV"></div>
-		<div id="OpenPayForm">
+	<div id="merchantPage">
+		<h1>Jarett's Shop</h1>
+		<div id="main">
+			<div id="fieldsContainer">
+				<div id="merchantCreditCard">
+					<div class="fieldSpace"></div>
+				</div>
+				<div id="merchantCVV">
+					<div class="fieldSpace"></div>
+				</div>
+				<div id="merchantExpiry">
+					<div class="fieldSpace"></div>
+				</div>
+				<div id="submit">
+					<div class="fieldSpace"></div>
+				</div>
+				<div id="OpenPayForm"></div>
+			</div>
+			<testing-options></testing-options>
 		</div>
 	</div>
-	<script src="easyfields-plugin.js"></script>
 </body>
+<!-- <script src="easyfields-plugin.js"></script> -->
+<script src="testingOptions.js"></script>
 <script>
-	var form = OpenEdgePlugin.makeForm('#OpenPayForm', {
-		fields: {
-			'submit': {
-				value: "Pay $20.00"
-			}
-		}
-	});
-
-	// var form = OpenEdgePlugin.makeForm(false, {
-	// 	defaultStyle: false,
+	// var form = OpenEdgePlugin.makeForm('#OpenPayForm', {
 	// 	fields: {
-	// 		"card-number": {
-	// 			target: "#merchantCreditCard",
-	// 			style: 'input {border-radius: 10px; padding:10px;}'
-	// 		},
-	// 		'submit': {  
-	// 			value: 'Pay $20.00'
+	// 		'submit': {
+	// 			value: "Pay $20.00"
 	// 		}
 	// 	}
 	// });
+
+	var merchantStyle = 'input {border-radius: 10px; padding:10px';
+	var form = OpenEdgePlugin.makeForm(false, {
+		// defaultStyle: false,
+		fields: {
+			"card-number": {
+				target: "#merchantCreditCard",
+				style: merchantStyle
+			},
+			'card-cvv': {
+				target: "#merchantCVV",
+				style: merchantStyle
+			},
+			'card-expiration': {
+				target: '#merchantExpiry',
+				style: merchantStyle
+			},
+			'submit': {
+				value: 'Pay $20.00',
+				target: "#submit"
+			}
+		}
+	});
 
 	form.on('ready', function () {
 		console.log('form ready');
@@ -71,7 +80,6 @@
 	form.on('token-success', function (token) {
 		console.log("successful token creation: " + token);
 	})
-
 </script>
 
 </html>

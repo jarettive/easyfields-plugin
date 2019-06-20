@@ -4,8 +4,8 @@ import defaultcss from './field.css';
 class IFrameField {
 	static eventID = 'openedge:field:';
 	static paymentFieldID = 'openedge-payment-field';
-	// static fieldURL = 'http://127.0.0.1:5501/field.html';
-	static fieldURL = 'http://htmlpreview.github.io/?https://raw.githubusercontent.com/jarettive/easyfields-plugin/master/dist/field.html';
+	static fieldURL = 'http://127.0.0.1:5501/field.html';
+	// static fieldURL = 'http://htmlpreview.github.io/?https://raw.githubusercontent.com/jarettive/easyfields-plugin/master/dist/field.html';
 
 	constructor(name, data) {
 		this.data = data;
@@ -22,6 +22,9 @@ class IFrameField {
 		const el = this.createMainElement();
 
 		if (target instanceof HTMLElement) {
+			while (target.firstChild) {
+				target.removeChild(target.firstChild);
+			}
 			target.appendChild(el);
 		}
 	}
@@ -63,8 +66,8 @@ class IFrameField {
 			}));
 		iframe.name = name;
 		iframe.src = src;
-		iframe.scrolling = "no";
-		iframe.setAttribute("allowtransparency", "true");
+		iframe.scrolling = 'no';
+		iframe.setAttribute('allowtransparency', 'true');
 		return iframe;
 	}
 
@@ -127,20 +130,25 @@ class IFrameField {
 		if (IFrameField.data.name === 'submit') {
 			field.textContent = Util.encodeEntities(data.value);
 		}
-		Util.addStyleSheet(data.style || (!data.defaultStyle && defaultcss) || '');
+
+		data.style && Util.addStyleSheet(data.style);
+		Util.addStyleSheet((!data.defaultStyle && defaultcss));
 		IFrameField.triggerResize();
 	}
 
 	static setPlaceholder(field, placeholder) {
+		placeholder = placeholder || '';
+
 		for (const ch of placeholder) {
 			if (ch !== '·' &&
 				ch !== '•' &&
+				ch !== '*' &&
 				ch !== ' ') {
 				placeholder = Util.encodeEntities(placeholder);
 				break;
 			}
 		}
-		field.setAttribute('placeholder', placeholder || '');
+		field.setAttribute('placeholder', placeholder);
 	}
 
 	//Tell the parent window the height of this window's content so it can resize the iframe appropriately
