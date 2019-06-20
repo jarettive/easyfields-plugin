@@ -1,6 +1,6 @@
 
-import IFrameField from "./IFrameField";
-import Form from "./Form";
+import IFrameField from './IFrameField';
+import Form from './Form';
 
 export default {
 	Form: Form,

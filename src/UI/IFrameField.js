@@ -123,16 +123,16 @@ class IFrameField {
 		);
 	}
 
-	static initializePaymentField(data) {
+	static initializePaymentField(fieldAttrs) {
 		const field = document.getElementById(IFrameField.paymentFieldID);
-		IFrameField.setPlaceholder(field, data.placeholder);
-		field.setAttribute('value', Util.encodeEntities(data.value) || '');
+		IFrameField.setPlaceholder(field, fieldAttrs.placeholder);
+		field.setAttribute('value', Util.encodeEntities(fieldAttrs.value) || '');
 		if (IFrameField.data.name === 'submit') {
-			field.textContent = Util.encodeEntities(data.value);
+			field.textContent = Util.encodeEntities(fieldAttrs.value);
 		}
 
-		data.style && Util.addStyleSheet(data.style);
-		Util.addStyleSheet((!data.defaultStyle && defaultcss));
+		fieldAttrs.style && Util.addStyleSheet(fieldAttrs.style);
+		Util.addStyleSheet((!fieldAttrs.defaultStyle && defaultcss));
 		IFrameField.triggerResize();
 	}
 
@@ -202,7 +202,8 @@ class IFrameField {
 			window.fieldTypes = queryData.fieldTypes;
 			window.receivedFields = window.receivedFields || {};
 			window.receivedFields['card-number'] = value;
-		} else {
+		}
+		else {
 			IFrameField.passToAccumulatorWindow(value);
 		}
 	}
@@ -243,8 +244,6 @@ class IFrameField {
 			console.dir(window.receivedFields);
 
 			// TODO: Implement tokenization here 
-
-			// 
 
 			// TODO: Trigger a 'token-success' event for the Form to catch 
 

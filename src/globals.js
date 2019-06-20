@@ -1,6 +1,6 @@
 class Globals {
 	assetBaseUrl = function () {
-		return "";
+		return '';
 	}
 }
 

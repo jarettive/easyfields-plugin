@@ -17,29 +17,12 @@
 </head>
 
 <body>
-	<div id="merchantPage">
-		<h1>Jarett's Shop</h1>
-		<div id="main">
-			<div id="fieldsContainer">
-				<div id="merchantCreditCard">
-					<div class="fieldSpace"></div>
-				</div>
-				<div id="merchantCVV">
-					<div class="fieldSpace"></div>
-				</div>
-				<div id="merchantExpiry">
-					<div class="fieldSpace"></div>
-				</div>
-				<div id="submit">
-					<div class="fieldSpace"></div>
-				</div>
-				<div id="OpenPayForm"></div>
-			</div>
-			<testing-options></testing-options>
-		</div>
+	<div id="main">
+		<merchant-page></merchant-page>
 	</div>
 </body>
-<!-- <script src="easyfields-plugin.js"></script> -->
+<script src="easyfields-plugin.js"></script>
+<script src="merchantPage.js"></script>
 <script src="testingOptions.js"></script>
 <script>
 	// var form = OpenEdgePlugin.makeForm('#OpenPayForm', {
@@ -50,20 +33,20 @@
 	// 	}
 	// });
 
-	var merchantStyle = 'input {border-radius: 10px; padding:10px';
+	var merchantStyle = 'input {border-radius: 10px; border-width: 0; padding:10px';
 	var form = OpenEdgePlugin.makeForm(false, {
 		// defaultStyle: false,
 		fields: {
 			"card-number": {
-				target: "#merchantCreditCard",
+				target: "#card-number",
 				style: merchantStyle
 			},
 			'card-cvv': {
-				target: "#merchantCVV",
+				target: "#card-cvv",
 				style: merchantStyle
 			},
 			'card-expiration': {
-				target: '#merchantExpiry',
+				target: '#card-expiration',
 				style: merchantStyle
 			},
 			'submit': {

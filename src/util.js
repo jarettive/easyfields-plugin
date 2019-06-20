@@ -3,7 +3,7 @@ class Util {
 		var S4 = function () {
 			return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
 		};
-		return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+		return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4());
 	}
 
 	static strEquals(a, b) {
@@ -15,13 +15,13 @@ class Util {
 	static encodeEntities(value) {
 		if (value) {
 			return value
-				.replace(/&/g, "&amp;").replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, (v) => {
+				.replace(/&/g, '&amp;').replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, (v) => {
 					const hi = v.charCodeAt(0);
 					const low = v.charCodeAt(1);
-					return "&#" + ((hi - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000) + ";";
+					return '&#' + ((hi - 0xd800) * 0x400 + (low - 0xdc00) + 0x10000) + ';';
 				}).replace(/([^\#-~| |!])/g, (v) => {
-					return "&#" + v.charCodeAt(0) + ";";
-				}).replace(/</g, "&lt;").replace(/>/g, "&gt;");
+					return '&#' + v.charCodeAt(0) + ';';
+				}).replace(/</g, '&lt;').replace(/>/g, '&gt;');
 		}
 	}
 
@@ -32,7 +32,8 @@ class Util {
 		if (el.styleSheet) {
 			// for IE
 			el.styleSheet.cssText = css;
-		} else {
+		}
+		else {
 			el.appendChild(document.createTextNode(css));
 		}
 
@@ -55,7 +56,8 @@ class Util {
 				if (Util.isObject(source[key])) {
 					if (!target[key]) Object.assign(target, { [key]: {} });
 					this.mergeDeep(target[key], source[key]);
-				} else {
+				}
+				else {
 					Object.assign(target, { [key]: source[key] });
 				}
 			}

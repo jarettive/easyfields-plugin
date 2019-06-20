@@ -6,32 +6,32 @@ import Form from './UI/Form';
 	class OpenEdgePlugin {
 
 		defaultFields = {
-			"card-holder-name": {
-				placeholder: "John Doe",
-				label: "Card Holder Name",
+			'card-holder-name': {
+				placeholder: 'John Doe',
+				label: 'Card Holder Name',
 			},
-			"card-number": {
-				placeholder: "•••• •••• •••• ••••",
-				label: "Card Number",
+			'card-number': {
+				placeholder: '•••• •••• •••• ••••',
+				label: 'Card Number',
 			},
-			"card-expiration": {
-				placeholder: "MM / YYYY",
-				label: "Card Expiration",
+			'card-expiration': {
+				placeholder: 'MM / YYYY',
+				label: 'Card Expiration',
 			},
-			"card-cvv": {
-				placeholder: "•••",
-				label: "Card Cvv"
+			'card-cvv': {
+				placeholder: '•••',
+				label: 'Card Cvv'
 			},
-			"submit": {
-				value: "Submit",
+			'submit': {
+				value: 'Submit',
 			}
 		};
 
 		makeForm = function (target, formOptions) {
-			if (typeof target === "string") {
+			if (typeof target === 'string') {
 				const el = document.querySelector(target);
 				if (!el) {
-					throw new Error("Form target does not exist");
+					throw new Error('Form target does not exist');
 				}
 				target = el;
 			}

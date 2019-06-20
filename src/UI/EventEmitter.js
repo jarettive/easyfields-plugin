@@ -22,7 +22,8 @@ class EventEmitter {
 	off = (event, listener) => {
 		if (listener == undefined) {
 			delete this.events[event];
-		} else {
+		}
+		else {
 			const listeners = this.events[event];
 			if (typeof listeners === 'object') {
 				let idx = listeners.indexOf(listener);
